@@ -20,5 +20,12 @@ jobs:
       name: ${{ inputs.env }}
     steps:
       - name: Print target environment
+      
         run: |
           echo "deploy to ${{ github.environment }}"
+
+          - name: Visa maskerad hemlighet
+        env:
+          # Mappa GitHub Secret 'MY_API_KEY' till en lokal miljövariabel 'MIN_NYCKEL'
+          MY_API_KEY: ${{ secrets.MY_API_KEY }}
+        run: echo "Värdet på hemligheten är: $MY_API_KEY"
