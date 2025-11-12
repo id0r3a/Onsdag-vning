@@ -7,7 +7,7 @@ on:
       env:
         description: "Environment to deploy to"
         required: true
-        default: dev
+        default: development         # MÅSTE matcha ett faktiskt environment
         type: choice
         options: [development, production]
 
@@ -15,19 +15,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # DETTA ÄR NYCKELN: bind job till valt environment
+    # Binder jobbet till environmentet så GitHub fyller i github.environment
     environment:
       name: ${{ inputs.env }}
 
     steps:
-      - name: Print target environment
-        run: echo "deploy to ${{ github.environment }}"
+      - name: Print target environment (should NOT be empty)
+        run: |
+          echo "inputs.env='${{ inputs.env }}'"
+          echo "github.environment='${{ github.environment }}'"
 
-      # Kör bara i dev, där vi lade secret
-      - name: Echo masked secret (dev only)
-        if: ${{ github.environment == 'dev' }}
+      - name: Echo masked secret (only in development)
+        if: ${{ github.environment == 'development' }}
         run: echo "MY_API_KEY (masked):${{ secrets.MY_API_KEY }}"
 
-      - name: Use secret in a command (dev only)
-        if: ${{ github.environment == 'dev' }}
+      - name: Use secret in a command (only in development)
+        if: ${{ github.environment == 'development' }}
         run: curl -H "Authorization:Bearer ${{ secrets.MY_API_KEY }}" https://example.com/ping || true
