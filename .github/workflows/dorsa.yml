@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yml
 name: Deploy
 
 on:
@@ -8,24 +9,25 @@ on:
         required: true
         default: dev
         type: choice
-        options:
-          - development
-          - production
+        options: [dev, prod]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Detta knyter jobben till valt environment. Prod kommer kräva review.
+
+    # DETTA ÄR NYCKELN: bind job till valt environment
     environment:
       name: ${{ inputs.env }}
+
     steps:
       - name: Print target environment
-      
-        run: |
-          echo "deploy to ${{ github.environment }}"
+        run: echo "deploy to ${{ github.environment }}"
 
-      - name: Visa maskerad hemlighet
-        env:
-          # Mappa GitHub Secret 'MY_API_KEY' till en lokal miljövariabel 'MIN_NYCKEL'
-          MY_API_KEY: ${{ secrets.MY_API_KEY }}
-        run: echo "My API key is ${{ secrets.MY_API_KEY }}"
+      # Kör bara i dev, där vi lade secret
+      - name: Echo masked secret (dev only)
+        if: ${{ github.environment == 'dev' }}
+        run: echo "MY_API_KEY (masked):${{ secrets.MY_API_KEY }}"
+
+      - name: Use secret in a command (dev only)
+        if: ${{ github.environment == 'dev' }}
+        run: curl -H "Authorization: Bearer ${{ secrets.MY_API_KEY }}" https://example.com/ping || true
