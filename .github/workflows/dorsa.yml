@@ -30,4 +30,4 @@ jobs:
 
       - name: Use secret in a command (dev only)
         if: ${{ github.environment == 'dev' }}
-        run: curl -H "Authorization: Bearer ${{ secrets.MY_API_KEY }}" https://example.com/ping || true
+        run: curl -H "Authorization:Bearer ${{ secrets.MY_API_KEY }}" https://example.com/ping || true
